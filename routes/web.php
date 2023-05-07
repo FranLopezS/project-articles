@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\ArticleController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('index', ['name' => 'James']);
+// });
+
+Route::get('/', [ArticleController::class, 'list'])->name('index');
+Route::get('/novedades', [ArticleController::class, 'list_novedades'])->name('novedades');
+// Route::get('/{category_slug}/{article_slug}', [ArticleController::class, 'show'])->name('novedades');

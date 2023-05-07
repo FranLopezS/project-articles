@@ -10,14 +10,13 @@ class Article extends Model
     use HasFactory;
 
     protected $table = 'articles';
-    protected $primaryKey = 'slug';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $primaryKey = 'id_article';
     public $timestamps = false;
 
     protected $fillable = [
         'name',
         'content',
-        'slug'
+        'slug',
+        'id_user'
     ];
 }

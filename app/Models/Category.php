@@ -10,9 +10,7 @@ class Category extends Model
     use HasFactory;
 
     protected $table = 'categories';
-    protected $primaryKey = 'slug';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $primaryKey = 'id_category';
     public $timestamps = false;
 
     protected $fillable = [
