@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('articles', function (Blueprint $table) {
-            $table->id('id_article');
+            $table->id('article_id');
             $table->string('title', 100);
             $table->text('content');
             $table->string('slug', 100)->unique();
-            $table->integer('id_user');
-            $table->foreign('id_user')->references('id_user')->on('users');
+            // $table->integer('user_id');
+            // $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 

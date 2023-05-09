@@ -12,25 +12,7 @@
     <body class="antialiased">
         <p>VSG Articles</p>
         <p><a href="{{ route('index') }}">Inicio</a> | <a href="{{ route('novedades') }}">Novedades</a></p>
-        @foreach ($articles as $article)
-            <p>
-                <a href="{{ route('article', ['category_slug' => 1, 'article_slug' => 'yes']) }}">{{ $article->title }}</a> | 
-                @foreach ($article->categories as $category)
-                    {{ $category->name }}
-                @endforeach
-            </p>
-        @endforeach
-        <!-- <header>
-            VSG Articles
-            <nav>
-                Inicio | Novedades
-            </nav>
-        </header>
-        <main>
-            <section>
-                <article></article>
-            </section>
-        </main>
-        <footer></footer> -->
+        
+        
     </body>
 </html>

@@ -21,4 +21,4 @@ use App\Http\Controllers\ArticleController;
 
 Route::get('/', [ArticleController::class, 'list'])->name('index');
 Route::get('/novedades', [ArticleController::class, 'list_novedades'])->name('novedades');
-// Route::get('/{category_slug}/{article_slug}', [ArticleController::class, 'show'])->name('novedades');
+Route::get('/{category_slug}/{article_slug}', [ArticleController::class, 'show'])->name('article');
