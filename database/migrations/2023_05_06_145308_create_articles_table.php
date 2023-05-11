@@ -16,8 +16,10 @@ return new class extends Migration
             $table->string('title', 100);
             $table->text('content');
             $table->string('slug', 100)->unique();
-            // $table->integer('user_id');
-            // $table->foreign('user_id')->references('user_id')->on('users');
+            $table->integer('user_id')->nullable();
+            $table->foreign('user_id')->references('user_id')->on('users');
+            $table->integer('category_id')->nullable();
+            $table->foreign('category_id')->references('category_id')->on('categories');
         });
     }
 

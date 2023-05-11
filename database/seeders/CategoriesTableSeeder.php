@@ -12,8 +12,8 @@ class CategoriesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Category::truncate();
         \App\Models\Article::truncate();
+        \App\Models\Category::truncate();
         \App\Models\User::truncate();
 
         \App\Models\Category::create([

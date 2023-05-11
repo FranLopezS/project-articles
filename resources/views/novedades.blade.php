@@ -13,7 +13,9 @@
         <p>VSG Articles</p>
         <p><a href="{{ route('index') }}">Inicio</a> | <a href="{{ route('novedades') }}">Novedades</a></p>
         @foreach ($articles as $article)
-            <p>{{ $article->title }} | {{ $article->name }}</p>
+            <p>{{ $article->title }} | {{ $article->category->name }}</p>
+            <a href="{{ route('article', ['category_slug' => $article->category->slug, 'article_slug' => $article->slug]) }}">Ver más</a>
+            <hr />
         @endforeach
         <!-- <header>
             VSG Articles

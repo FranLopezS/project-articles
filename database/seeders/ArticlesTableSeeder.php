@@ -20,16 +20,17 @@ class ArticlesTableSeeder extends Seeder
     {
         Article::truncate();
 
-        $categoriesIds = array();
+        $categories = array();
         $users = array();
         $categoriesData = Category::all();
         $usersData = User::all();
-        foreach ($categoriesData as $category) $categoriesIds[] = $category->id_category;
+        foreach ($categoriesData as $category) $categories[] = $category;
         foreach ($usersData as $user) $users[] = $user;
         
         $faker = Faker::create('es_ES');
         for ($i=0; $i < 100; $i++) {
             shuffle($users);
+            shuffle($categories);
 
             $title = $faker->sentence($nbWords = 6, $variableNbWords = true);
             $slug = Str::slug($title, '-');
@@ -39,12 +40,8 @@ class ArticlesTableSeeder extends Seeder
                 'slug' => $slug
             ]);
             $newArticle->user()->associate($users[0]);
-            
-            shuffle($categoriesIds);
-            $categoriesToAdd = rand(1, count($categoriesIds));
-            for ($p=0; $p < $categoriesToAdd; $p++) { // Se asigna una o más categorías al artículo.
-                $newArticle->categories()->attach($categoriesIds[$p]);
-            }
+            $newArticle->category()->associate($categories[0]);
+            $newArticle->save();
         }
     }
 }

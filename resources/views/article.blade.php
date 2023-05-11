@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        @vite('resources/css/app.css')
         <title>VSG Articles</title>
         <!-- Styles -->
         <style>
@@ -10,9 +11,42 @@
         </style>
     </head>
     <body class="antialiased">
-        <p>VSG Articles</p>
-        <p><a href="{{ route('index') }}">Inicio</a> | <a href="{{ route('novedades') }}">Novedades</a></p>
-        
-        
+
+        <div class="container ml-40 mr-40 mt-8">
+            <nav class="w-full h-max">
+                <div class="flex flex-row items-center space-x-96">
+                    <div class="flex flex-col items-center text-left">
+                        <p class="text-xl md:text-3xl font-bold text-sky-900">
+                            VSG Blog
+                        </p>
+                    </div>
+                    <div class="flex flex-row items-center text-right space-x-20">
+                        <p class="text-xl md:text-3xl font-bold text-sky-900">
+                            <a href="{{ route('index') }}">Inicio</a>
+                        </p>
+                        <p class="text-xl md:text-3xl font-bold text-sky-900">
+                            <a href="{{ route('novedades') }}">Novedades</a>
+                        </p>
+                        <p class="text-xl md:text-3xl font-bold text-sky-900">
+                            Iniciar sesión
+                        </p>
+                    </div>
+                </div>
+            </nav>
+            <main class="w-full h-max">
+                <section class="flex flex-col items-start text-justify mt-10">
+                    <p class="text-2xl">
+                        {{ $article->title }}
+                    </p>
+                    <p class="text-lg">
+                        {{ $article->category->name }}
+                    </p>
+                    <p class="mt-4 text-lg italic">
+                        {{ $article->content }}
+                    </p>
+                </section>
+            </main>
+        </div>
+
     </body>
 </html>
