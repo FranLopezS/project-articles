@@ -28,7 +28,7 @@ class ArticlesTableSeeder extends Seeder
         foreach ($usersData as $user) $users[] = $user;
         
         $faker = Faker::create('es_ES');
-        for ($i=0; $i < 100; $i++) {
+        for ($i=0; $i < 13; $i++) {
             shuffle($users);
             shuffle($categories);
 

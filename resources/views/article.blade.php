@@ -4,6 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         @vite('resources/css/app.css')
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css"  rel="stylesheet" />
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <title>VSG Articles</title>
         <!-- Styles -->
         <style>
@@ -13,40 +15,142 @@
     <body class="antialiased">
 
         <div class="container ml-40 mr-40 mt-8">
-            <nav class="w-full h-max">
-                <div class="flex flex-row items-center space-x-96">
-                    <div class="flex flex-col items-center text-left">
-                        <p class="text-xl md:text-3xl font-bold text-sky-900">
-                            VSG Blog
-                        </p>
-                    </div>
-                    <div class="flex flex-row items-center text-right space-x-20">
-                        <p class="text-xl md:text-3xl font-bold text-sky-900">
-                            <a href="{{ route('index') }}">Inicio</a>
-                        </p>
-                        <p class="text-xl md:text-3xl font-bold text-sky-900">
-                            <a href="{{ route('novedades') }}">Novedades</a>
-                        </p>
-                        <p class="text-xl md:text-3xl font-bold text-sky-900">
-                            Iniciar sesión
-                        </p>
+            <nav class="bg-white border-gray-200 dark:bg-gray-900">
+                <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
+                    <a href="{{ route('index') }}" class="flex items-center">
+                        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ACME INC Blog</span>
+                    </a>
+                </div>
+            </nav>
+            <nav class="bg-gray-50 dark:bg-gray-700">
+                <div class="max-w-screen-xl px-4 py-3 mx-auto">
+                    <div class="flex items-center">
+                        <ul class="flex flex-row font-medium mt-0 mr-6 space-x-8 text-sm">
+                            <li>
+                                <a href="{{ route('index') }}" class="text-gray-900 dark:text-white hover:underline">Inicio</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('novedades') }}" class="text-gray-900 dark:text-white hover:underline">Novedades</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </nav>
+            
             <main class="w-full h-max">
-                <section class="flex flex-col items-start text-justify mt-10">
-                    <p class="text-2xl">
+                <section class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
+                    <p id="article-title" class="flex items-center text-2xl">
                         {{ $article->title }}
                     </p>
-                    <p class="text-lg">
-                        {{ $article->category->name }}
+                    <div class="flex items-center">
+                        @if(session()->has('email'))
+                            <button data-modal-target="editar-articulo" data-modal-toggle="editar-articulo" class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-900">Editar artículo</button>
+                            <button data-modal-target="borrar-articulo" data-modal-toggle="borrar-articulo" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Borrar artículo</button>
+                        @endif
+                    </div>
+                </section>
+                <section class="flex flex-col items-start text-justify mt-10">
+                    <p id="article-category" class="text-lg italic text-blue-700">
+                        Por {{ $article->user->name }}
                     </p>
-                    <p class="mt-4 text-lg italic">
+                    <p id="article-content" class="mt-4 text-lg italic">
                         {{ $article->content }}
                     </p>
                 </section>
             </main>
         </div>
 
+        <div id="editar-articulo" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative w-full max-w-4xl max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <!-- Modal header -->
+                    <div class="flex items-center justify-between p-5 border-b rounded-t dark:border-gray-600">
+                        <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+                            Editar artículo
+                        </h3>
+                        <button class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="editar-articulo">
+                            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            <span class="sr-only">Cerrar</span>
+                        </button>
+                    </div>
+                    <!-- Modal body -->
+                    <form method="POST" action="{{ route('update_article') }}">
+                        @csrf
+                        <div class="flex flex-col p-6 space-y-6">
+                            <input type="hidden" name="id" value="{{ $article->article_id }}" />
+                            <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Título</label>
+                            <input type="text" name="title" id="title" value="{{ $article->title }}" placeholder="Título del artículo" maxlength="50" />
+                            <label for="content" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contenido</label>
+                            <textarea id="content" name="content" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Contenido del artículo...">{{ $article->content }}</textarea>
+                            <label for="categories" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selecciona una categoría</label>
+                            <select id="categories" name="categories" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                            <button data-modal-hide="editar-articulo" type="submit" class="text-black bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Editar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="borrar-articulo" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative w-full max-w-md max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <!-- Modal header -->
+                    <div class="flex items-center justify-between p-5 border-b rounded-t dark:border-gray-600">
+                        <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+                            Borrar artículo
+                        </h3>
+                        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="borrar-articulo">
+                            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            <span class="sr-only">Cerrar</span>
+                        </button>
+                    </div>
+                    <!-- Modal body -->
+                    <form method="POST" action="{{ route('delete_article') }}">
+                        @csrf
+                        <div class="p-6 space-y-6">
+                            <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                ¿Seguro que quieres borrar este artículo?
+                            </p>
+                            <input type="hidden" name="id" value="{{ $article->article_id }}" />
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                            <button data-modal-hide="borrar-articulo" type="submit" class="text-black bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Borrar artículo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: "{{ route('list_categories') }}",
+                data: $(this).serializeArray(),
+                error: function(xhr, status, error) {
+                    console.log("Mal...");
+                },
+                success: function(data) {
+                    const categories = data[0];
+                    $('#categories').empty();
+                    for (let i = 0; i < categories.length; i++) {
+                        const category = categories[i];
+                        if(category['slug'] == "{{ $article->category->slug }}") {
+                            $('#categories').append("<option value='"+category['category_id']+"' selected>"+category['name']+"</option>");
+                        } else {
+                            $('#categories').append("<option value='"+category['category_id']+"'>"+category['name']+"</option>");
+                        }
+                    }
+                    // console.log(data); //listed-categories
+                }
+            });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
     </body>
 </html>

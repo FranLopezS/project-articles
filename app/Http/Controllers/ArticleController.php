@@ -6,19 +6,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 use App\Models\Article;
+use App\Models\User;
 use App\Models\Category;
+use Illuminate\Database\QueryException;
 
 class ArticleController extends Controller
 {
     public function list()
     {
-        $articles = Article::all();
+        $articles = Article::paginate(5);
         return view('index')->with('articles', $articles);
     }
 
     public function list_novedades()
     {
-        $articles = Article::all();
+        $articles = Article::whereHas('category', function($q) {
+            $q->where('slug', 'novedades');
+        })->paginate(5);
         return view('novedades')->with('articles', $articles);
     }
 
@@ -34,29 +38,51 @@ class ArticleController extends Controller
         $slug = Str::slug($title, '-');
         $content = $request->content;
         $category_id = $request->categories;
+        $emailUser = $request->session()->get('email');
 
-        $category = Category::find($category_id);
-
-        if($newArticle = Article::create(['title' => $title, 'slug' => $slug, 'content' => $content])) {
-            $newArticle->category()->associate($category);
-            $newArticle->save();
-            return response()->json(['0']); // Ok
+        $user = User::where('email', $emailUser)->first();
+        $category = Category::where('category_id', $category_id)->first();
+        // dd($category);
+        try {
+            if($newArticle = Article::create(['title' => $title, 'slug' => $slug, 'content' => $content])) {
+                $newArticle->category()->associate($category);
+                $newArticle->user()->associate($user);
+                $newArticle->save();
+                return response()->json(['¡Artículo creado correctamente!']); // Ok
+            }
+        } catch (QueryException $e) {
+            return response()->json(['¡Ya existe ese artículo!']);
         }
         
-        return response()->json(['1']); // Error
+        return response()->json(['¡Error al crear el artículo!']); // Error
     }
 
     public function update(Request $request)
     {
+        $article_id = $request->id;
         $title = $request->title;
         $slug = Str::slug($title, '-');
         $content = $request->content;
+        $category_id = $request->categories;
+        
+        $category = Category::find($category_id);
+        $article = Article::where('article_id', $article_id)->first();
 
-        if(Article::where('article_id', $request->id)->update(['title' => $title, 'slug' => $slug, 'content' => $content])) {
-            return response()->json(['0']); // Ok
+        try {
+            // Si no cambia la categoría ni el título, no habría que recargar.
+            if($article->update(['title' => $title, 'slug' => $slug, 'content' => $content])) {
+                $article->category()->associate($category);
+                $article->save();
+            }
+        } catch (QueryException $e) {
+            try {
+                $article->update(['content' => $content]);
+            } catch (QueryException $e) {
+                //throw $th;
+            }
         }
         
-        return response()->json(['1']); // Error
+        return redirect()->route('article', ['category_slug' => $category->slug, 'article_slug' => $slug]);
     }
 
     public function delete(Request $request)
@@ -64,8 +90,8 @@ class ArticleController extends Controller
         $id = $request->id;
 
         $article = Article::find($id);
-        if($article->delete()) return response()->json(['0']); // Ok
+        if($article->delete()) return redirect()->route('index'); // Ok
         
-        return response()->json(['1']); // Error
+        return redirect()->route('index'); // Error
     }
 }

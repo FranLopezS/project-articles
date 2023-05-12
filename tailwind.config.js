@@ -2,7 +2,8 @@
 module.exports = {
   content: [
     "./resources/**/*.blade.php",
-    require('flowbite/plugin')
+    require('flowbite/plugin'),
+    "./node_modules/flowbite/**/*.js"
     // "./resources/**/*.js"
   ],
   theme: {

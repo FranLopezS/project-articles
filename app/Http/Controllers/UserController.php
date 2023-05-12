@@ -11,42 +11,36 @@ use App\Models\User;
 class UserController extends Controller
 {
     public function login(Request $request) {
-        $credentials =$request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
-        // echo "1 ";
-        // $user = User::where('email', $request->email)->first();
-        // if(!isset($user->email)) return; // Usuario no existe.
-        // echo "2 ";
-        // if(!Hash::check($request->password, $user->password)) return; // Contraseña incorrecta.
 
-        // $request->session()->put('user_id', $user->user_id);
-        // $request->session()->put('name', $user->email);
-        // $request->session()->put('email', $user->user_id);
-        // echo "5 ";
-        // $credentials = [
-        //     'email' => session('email'),
-        //     'password' => $request->password
-        // ];
-
-        if(Auth::attemp($credentials)) {
-            $request->session()->regenerate();
-            echo "4 ";
-            return redirect('/')->with('status-success', '¡Sesión iniciada correctamente!');
+        try {
+            if(Auth::attempt($credentials))
+            {
+                $request->session()->put('email', $request->email);
+                $request->session()->regenerate();
+                return response()->json(['¡Sesión iniciada correctamente!']);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['¡Error al iniciar sesión!']);
         }
-
-        echo "3 ";
-        return redirect('/')->with('status-error', '¡Error al iniciar sesión!');
+        
+        return response()->json(['¡Credenciales incorrectas!']);
     }
 
-    public function signOut() {
-        Auth::logout();
+    public function signOut(Request $request) {
+        try {
+            Auth::logout();
  
-        $request->session()->invalidate();
- 
-        $request->session()->regenerateToken();
- 
-        return redirect('/');
+            $request->session()->invalidate();
+     
+            $request->session()->regenerateToken();
+     
+            return response()->json(['¡Sesión cerrada correctamente!']);
+        } catch (Throwable $th) {
+            return response()->json(['¡Error al cerrar sesión!']);
+        }
     }
 }
